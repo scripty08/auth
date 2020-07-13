@@ -1,0 +1,6 @@
+{
+  "logger": {
+    "logPrefix": "auth",
+    "logLevel": "trace"
+  }
+}

@@ -1,17 +1,14 @@
 import { LOGOUT_RESPONSE, LOGIN_RESPONSE, REGISTER_RESPONSE } from './Constants';
-import passportLocalMongoose from 'passport-local-mongoose';
+import jwt from "jsonwebtoken";
 import { Email } from './Email';
 import { Logger } from '@scripty/logger';
+import { BaseRepository } from './BaseRepository';
 import { getPasswordResetURL, resetPasswordTemplate, usePasswordHashToMakeToken } from './helper';
-import jwt from "jsonwebtoken";
 
-export class AuthRepository {
+export class AuthRepository extends BaseRepository {
 
-    constructor(requestSchema, mongoose) {
-        delete mongoose.connection.models['admin_users'];
-        let Schema = new mongoose.Schema(requestSchema);
-        Schema.plugin(passportLocalMongoose);
-        this.model = mongoose.model('admin_users', Schema);
+    constructor(requestSchema, db, collection) {
+        super(requestSchema, db, collection);
     }
 
     login(request, passport, presenter) {

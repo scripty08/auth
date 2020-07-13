@@ -1,54 +1,57 @@
 import { AuthPresenter } from './AuthPresenter.js';
-import { applyMongoStrategy } from './MongoStrategy.js';
+import { initMongoStrategy } from './MongoStrategy.js';
 import passport from 'passport';
 import { AuthRepository } from './AuthRepository';
 
 export class AuthController {
 
-    constructor(options) {
-        this.requestSchema = options.request;
-        this.responseSchema = options.response;
-        this.responseSchema = options.response;
-        this.passport = passport;
+    static requestSchema = {
+        username: String,
+        password: String
     }
 
-    init(server, router, mongoose) {
-        applyMongoStrategy(server, router, mongoose);
-        router.post('/users/login', this.loginAction.bind(this, mongoose));
-        router.post('/users/logout', this.logoutAction.bind(this, mongoose));
-        router.post('/users/register', this.registerAction.bind(this, mongoose));
-        router.post('/users/forgotPassword', this.forgotPasswordAction.bind(this, mongoose));
-        router.post('/users/resetPassword', this.resetPasswordAction.bind(this, mongoose));
+    static responseSchema = {
+        username: String,
+        password: String
+    }
+
+    static collection = 'admin_users'
+
+    init(server, router) {
+        initMongoStrategy(server);
+        this.db = server.db;
+        this.repository = new AuthRepository(AuthController.requestSchema, this.db, AuthController.collection);
+
+        router.post('/users/login', this.loginAction.bind(this));
+        router.post('/users/logout', this.logoutAction.bind(this));
+        router.post('/users/register', this.registerAction.bind(this));
+        router.post('/users/forgotPassword', this.forgotPasswordAction.bind(this));
+        router.post('/users/resetPassword', this.resetPasswordAction.bind(this));
         server.use(router);
     }
 
-    loginAction(req, res, mongoose) {
-        const presenter = new AuthPresenter(res, this.responseSchema);
-        const repository = new AuthRepository(this.requestSchema, mongoose);
-        return repository.login(req, this.passport, presenter);
+    loginAction(req, res) {
+        const presenter = new AuthPresenter(res, AuthController.responseSchema);
+        return this.repository.login(req, passport, presenter);
     };
 
-    logoutAction(req, res, mongoose) {
-        const presenter = new AuthPresenter(res, this.responseSchema);
-        const repository = new AuthRepository(this.requestSchema, mongoose);
-        return repository.logout(req, presenter);
+    logoutAction(req, res) {
+        const presenter = new AuthPresenter(res, AuthController.responseSchema);
+        return this.repository.logout(req, presenter);
     };
 
-    registerAction(req, res, mongoose) {
-        const presenter = new AuthPresenter(res, this.responseSchema);
-        const repository = new AuthRepository(this.requestSchema, mongoose);
-        return repository.register(req.body, presenter);
+    registerAction(req, res) {
+        const presenter = new AuthPresenter(res, AuthController.responseSchema);
+        return this.repository.register(req.body, presenter);
     };
 
-    forgotPasswordAction(req, res, mongoose) {
-        const presenter = new AuthPresenter(res, this.responseSchema);
-        const repository = new AuthRepository(this.requestSchema, mongoose);
-        return repository.forgotPassword(req.body, presenter);
+    forgotPasswordAction(req, res) {
+        const presenter = new AuthPresenter(res, AuthController.responseSchema);
+        return this.repository.forgotPassword(req.body, presenter);
     };
 
-    resetPasswordAction(req, res, mongoose) {
-        const presenter = new AuthPresenter(res, this.responseSchema);
-        const repository = new AuthRepository(this.requestSchema, mongoose);
-        return repository.resetPassword(req.body, presenter);
+    resetPasswordAction(req, res) {
+        const presenter = new AuthPresenter(res, AuthController.responseSchema);
+        return this.repository.resetPassword(req.body, presenter);
     };
 }
