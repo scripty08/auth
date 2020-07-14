@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@scripty/mongo": "^0.6.0",
-    "@scripty/server": "^0.3.3",
+    "@scripty/server": "^0.3.4",
     "dotenv": "^8.2.0",
     "nodemon": "^2.0.4"
   },

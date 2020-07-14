@@ -23,7 +23,7 @@ const init = async () => {
 
     const mongoose = await mongo(mongoConfig);
 
-    await server.setDatabase(mongoose)
+    await server.setDatabase(mongoose);
 
     await server.addController(
         new AuthController(),
